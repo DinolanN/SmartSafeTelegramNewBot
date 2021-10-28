@@ -98,7 +98,7 @@ function sendStructuredMonthsPickupList(listOfPickups) {
 	let monthsList = 'Current Month Requests: \n' +
 		'Expected Amount - EA\n' +
 		'Deposited Amount - DA\n' +
-		'Settlement Amount - S\n' +
+		'Settlement Amount - SA\n' +
 		`${'-'.padEnd(47, '-')}\n\n` +
 		`${'Date'.padEnd(18)} - ` + `${'EA'.padEnd(10)} - ` + `${'DA'.padEnd(10)} - ` + `${'SA'.padEnd(10)}` + '\n';
 
