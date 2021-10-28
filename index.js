@@ -32,6 +32,12 @@ tg.router.when(new CustomFilterCommand($ => {
         return conversationHelper.checkRequestPickupText($.message.text)
     }, 'requestPickupCommand'), userController)
 .when(new CustomFilterCommand($ => {
+        return conversationHelper.checkRequestAmountText($.message.text)
+    }, 'requestAmountCommand'), userController)
+.when(new CustomFilterCommand($ => {
+        return conversationHelper.checkGetMonthsPickupText($.message.text)
+    }, 'getMonthPickupListCommand'), userController)
+.when(new CustomFilterCommand($ => {
         return conversationHelper.checkStartPickupText($.message.text)
     }, 'startPickupCommand'), driverController)
 .when(new CustomFilterCommand($ => {

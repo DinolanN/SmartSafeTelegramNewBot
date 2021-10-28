@@ -7,10 +7,12 @@ const axios = require('axios');
 const conversationConstants = require('../Constants/ConversationConstants');
 const registrationConstants = conversationConstants.USER_REGISTRATION;
 const requestPickupConstants = conversationConstants.REQUEST_PICKUP;
+const requestAmountConstants = conversationConstants.REQUEST_AMOUNT;
 
 const registerDriverModel = require('../Models/RegisterDriverModel');
 
 const userHelper = require('../Helpers/UserHelper');
+const conversationHelper = require('../Helpers/ConversationHelper');
 
 async function RegisterUser(registerModel, $) {
     await axios.post(`${API_URL}/RegisterUser`, {
@@ -115,14 +117,75 @@ async function RequestPickup(requestPickupModel, $) {
                 $.sendMessage(requestPickupConstants.SUCCESS_MESSAGE);
                 $.sendMessage(userHelper.SendDriverDetails(res.data.driverDetails.name, res.data.driverDetails.otp));
             })
-            .catch((error) => {
-                $.sendMessage(error.response.data);
+            .catch(() => {
+                $.sendMessage(requestPickupConstants.SOMETHING_WENT_WRONG);
             })
+        });
+}
+
+async function RequestAmountType(requestAmountObj, command,$) {
+    $.getUserSession('AccessToken')
+        .then((accessToken) => {
+            if (conversationHelper.checkWalletAmountText(command)) {
+                console.log(requestAmountObj.UserChatId);
+                axios.post(`${API_URL}/GetWalletBalance`, {
+                    UserChatId: requestAmountObj.UserChatId
+                },
+                {
+                    headers: {
+                        'AccessToken': accessToken
+                    }
+                }).then(res => {
+                    $.sendMessage(`The Total Amount to be Settled to you is:\n\nR${res.data.walletSettlementBalance.toFixed(2)}`);
+                })
+                .catch(() => {
+                    $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
+                });
+            }
+            else if (conversationHelper.checkPickupAmountText(command)){
+                axios.post(`${API_URL}/GetPickupAmount`, {
+                    UserChatId: requestAmountObj.UserChatId
+                },
+                {
+                    headers: {
+                        'AccessToken': accessToken
+                    }
+                }).then(res => {
+                    $.sendMessage(`Today\'s Pickup Amount is:\n\nR${res.data.walletSettlementBalance.toFixed(2)}`);
+                })
+                .catch(() => {
+                    $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
+                });
+            }
+            else {
+                $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
+            }
+        });
+}
+
+async function GetMonthsPickupList(getmonthsListObj, $) {
+    $.getUserSession('AccessToken')
+        .then((accessToken) => {
+            axios.post(`${API_URL}/GetMonthsPickupList`, {
+                UserChatId: getmonthsListObj.UserChatId
+            },
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                $.sendMessage(userHelper.sendStructuredMonthsPickupList(res.data));
+            })
+            .catch(() => {
+                $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
+            });
         });
 }
 
 module.exports = {
     RegisterUser,
     ConfirmUser,
-    RequestPickup
+    RequestPickup,
+    RequestAmountType,
+    GetMonthsPickupList
 }
