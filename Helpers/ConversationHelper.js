@@ -50,11 +50,58 @@ function checkRequectPickupLocationText(requestLocationText) {
     }
 }
 
+function checkRequestAmountText(requectWalletSettlementAmountText) {
+    if(conversationConstants.REQUEST_AMOUNT_OPTIONS.indexOf(requectWalletSettlementAmountText) !== -1){
+        return true;
+        } else {
+        return false
+    }
+}
+
+function checkWalletAmountText(walletSettlementAmountText) {
+    if(conversationConstants.WALLET_SETTLEMENT_AMOUNT_OPTIONS.indexOf(walletSettlementAmountText) !== -1){
+        return true;
+        } else {
+        return false
+    }
+}
+
+function checkPickupAmountText(pickupAmountText) {
+    if(conversationConstants.PICKUP_AMOUNT_OPTIONS.indexOf(pickupAmountText) !== -1){
+        return true;
+        } else {
+        return false
+    }
+}
+
+function checkGetMonthsPickupText(getMonthsPickupText) {
+    if(conversationConstants.GET_MONTHS_PICKUP_OPTIONS.indexOf(getMonthsPickupText) !== -1){
+        return true;
+        } else {
+        return false
+    }
+}
+
+const COMMANDS = 'Here is a list commands that you can try: ' +
+        '\n\n' + `${'Command'.padEnd(10)}` + `${'-'.padEnd(10)}` + 'Description' +
+        '\n' + `${'-'.padEnd(47, '-')}` +
+        '\n' + `${'R'.padEnd(20)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REGISTER +
+        '\n' + `${'RQ'.padEnd(18)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REQUEST_PICKUP +
+        '\n' + `${'RL'.padEnd(19)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REQUEST_LOCATION +
+        '\n' + `${'SP'.padEnd(19)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.START_PICKUP +
+        '\n' + `${'RA'.padEnd(19)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REQUEST_AMOUNT +
+        '\n' + `${'GM'.padEnd(18)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.GET_MONTHS_SETTLEMENTS
+
 module.exports = {
     checkHelloText,
     checkHelpText,
     checkRegisterText,
     checkRequestPickupText,
     checkStartPickupText,
-    checkRequectPickupLocationText
+    checkRequectPickupLocationText,
+    checkRequestAmountText,
+    checkWalletAmountText,
+    checkPickupAmountText,
+    checkGetMonthsPickupText,
+    COMMANDS
 }

@@ -2,13 +2,15 @@
 
 const Telegram = require('telegram-node-bot');
 
+const conversationHelper = require('../Helpers/ConversationHelper');
+
 class ConversationController extends Telegram.TelegramBaseController {
     helloHandler($) {
         $.sendMessage('Hello.');
     }
 
     helpHandler($) {
-        $.sendMessage('Help.');
+        $.sendMessage(conversationHelper.COMMANDS);
     }
 
     get routes() {
