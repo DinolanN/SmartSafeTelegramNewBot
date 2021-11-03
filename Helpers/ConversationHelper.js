@@ -82,15 +82,30 @@ function checkGetMonthsPickupText(getMonthsPickupText) {
     }
 }
 
-const COMMANDS = 'Here is a list commands that you can try: ' +
-        '\n\n' + `${'Command'.padEnd(10)}` + `${'-'.padEnd(10)}` + 'Description' +
-        '\n' + `${'-'.padEnd(47, '-')}` +
-        '\n' + `${'R'.padEnd(20)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REGISTER +
-        '\n' + `${'RQ'.padEnd(18)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REQUEST_PICKUP +
-        '\n' + `${'RL'.padEnd(19)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REQUEST_LOCATION +
-        '\n' + `${'SP'.padEnd(19)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.START_PICKUP +
-        '\n' + `${'RA'.padEnd(19)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.REQUEST_AMOUNT +
-        '\n' + `${'GM'.padEnd(18)}` + `${'-'.padEnd(10)}` + conversationConstants.HELP.GET_MONTHS_SETTLEMENTS
+const ALL_COMMANDS = 'Here is a list commands that you can use: ' +
+    '\n\n' + `${'Command'}` + `${' - '}` + 'Description' +
+    '\n' + `${'-'.padEnd(47, '-')}` +
+    '\n' + `${'R'}` + `${' - '}` + conversationConstants.HELP.REGISTER +
+    '\n' + `${'RQ'}` + `${' - '}` + conversationConstants.HELP.REQUEST_PICKUP +
+    '\n' + `${'RL'}` + `${' - '}` + conversationConstants.HELP.REQUEST_LOCATION +
+    '\n' + `${'SP'}` + `${' - '}` + conversationConstants.HELP.START_PICKUP +
+    '\n' + `${'RA'}` + `${' - '}` + conversationConstants.HELP.REQUEST_AMOUNT +
+    '\n' + `${'GM'}` + `${' - '}` + conversationConstants.HELP.GET_MONTHS_SETTLEMENTS
+
+const NORMAL_COMMANDS = 'Here is a list commands that you can use: ' +
+    '\n\n' + `${'Command'}` + `${' - '}` + 'Description' +
+    '\n' + `${'-'.padEnd(47, '-')}` +
+    '\n' + `${'R'}` + `${' - '}` + conversationConstants.HELP.REGISTER +
+    '\n' + `${'RQ'}` + `${' - '}` + conversationConstants.HELP.REQUEST_PICKUP +
+    '\n' + `${'RA'}` + `${' - '}` + conversationConstants.HELP.REQUEST_AMOUNT +
+    '\n' + `${'GM'}` + `${' - '}` + conversationConstants.HELP.GET_MONTHS_SETTLEMENTS
+
+const DRIVER_COMMANDS = 'Here is a list commands that you can use: ' +
+    '\n\n' + `${'Command'}` + `${' - '}` + 'Description' +
+    '\n' + `${'-'.padEnd(47, '-')}` +
+    '\n' + `${'R'}` + `${' - '}` + conversationConstants.HELP.REGISTER +
+    '\n' + `${'RL'}` + `${' - '}` + conversationConstants.HELP.REQUEST_LOCATION +
+    '\n' + `${'SP'}` + `${' - '}` + conversationConstants.HELP.START_PICKUP
 
 module.exports = {
     checkHelloText,
@@ -103,5 +118,7 @@ module.exports = {
     checkWalletAmountText,
     checkPickupAmountText,
     checkGetMonthsPickupText,
-    COMMANDS
+    ALL_COMMANDS,
+    NORMAL_COMMANDS,
+    DRIVER_COMMANDS
 }

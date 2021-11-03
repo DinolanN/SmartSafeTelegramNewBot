@@ -69,10 +69,10 @@ const REQUEST_PICKUP_FORM = {
 }
 
 const requestAmountQuestion = requestAmountConstants.AMOUNT_TYPE +
-	'\n\n' + `${'Command'.padEnd(10)}` + `${'-'.padEnd(10)}` + 'Description' + 
+	'\n\n' + `${'Command'}` + `${' - '}` + 'Description' + 
 	'\n' + `${'-'.padEnd(47, '-')}` +
-	'\n' + `${'WA'.padEnd(18)}` + `${'-'.padEnd(10)}` + requestAmountConstants.SELECT_WALLET_AMOUNT +
-	'\n' + `${'PA'.padEnd(19)}` + `${'-'.padEnd(10)}` + requestAmountConstants.SELECT_PICKUP_AMOUNT
+	'\n' + `${'WA'}` + `${' - '}` + requestAmountConstants.SELECT_WALLET_AMOUNT +
+	'\n' + `${'PA'}` + `${' - '}` + requestAmountConstants.SELECT_PICKUP_AMOUNT
 
 const REQUEST_AMOUNT_FORM = {
     amountType: {
@@ -80,7 +80,6 @@ const REQUEST_AMOUNT_FORM = {
 	    error: requestAmountConstants.WRONG_INPUT_ERROR,
 	    validator: (message, callback) => {
 		    if(message.text && (conversationHelper.checkWalletAmountText(message.text) || conversationHelper.checkPickupAmountText(message.text))) {
-			    console.log(requestAmountQuestion);
 				callback(true, message.text)
 			    return
 		    }
@@ -99,12 +98,13 @@ function sendStructuredMonthsPickupList(listOfPickups) {
 		'Expected Amount - EA\n' +
 		'Deposited Amount - DA\n' +
 		'Settlement Amount - SA\n' +
-		`${'-'.padEnd(47, '-')}\n\n` +
-		`${'Date'.padEnd(18)} - ` + `${'EA'.padEnd(10)} - ` + `${'DA'.padEnd(10)} - ` + `${'SA'.padEnd(10)}` + '\n';
+		`${'-'.padEnd(47, '-')}\n` +
+		`${'Date'} - ` + `${'EA'} - ` + `${'DA'} - ` + `${'SA'}` + '\n' +
+		`${'-'.padEnd(47, '-')}\n`;
 
 	listOfPickups.forEach(pickup => {
 		const pickupDate = pickup.createdOnUtc.toString().split('T');
-		monthsList += `${pickupDate[0]}   -  `+ `R${pickup.expectedAmount}   -  `+ `R${pickup.depositedAmount == 0 ? pickup.depositedAmount.toString().padEnd(6) : pickup.depositedAmount}   -  `+ `R${pickup.expectedSettlementAmount}` + '\n'
+		monthsList += `${pickupDate[0]} - `+ `R${pickup.expectedAmount} - `+ `R${pickup.depositedAmount == 0 ? pickup.depositedAmount : pickup.depositedAmount} - `+ `R${pickup.expectedSettlementAmount}` + '\n'
 	});
 
 	return monthsList;

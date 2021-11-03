@@ -9,192 +9,271 @@ const startPickupConstants = conversationConstants.START_PICKUP;
 
 const driverHelper = require('../Helpers/DriverHelper');
 
+async function LeavingOfficeMenu($) {
+    $.runMenu({
+		message: startPickupConstants.LEAVING_OFFICE_QUESTION,
+		oneTimeKeyboard: true,
+		options: {
+			parse_mode: 'Markdown',
+		},
+		layout: [2],
+		'Yes': async () => {
+			DepartFromOffice($);
+		},
+		'No': async () => {
+			LeavingOfficeMenu($);
+		}, 
+	})
+}
+
 async function DepartFromOffice($) {
     $.getUserSession('AccessToken')
     .then((accessToken) => {
-        axios.post(`${API_URL}/DepartFromOffice`, {},
-        {
-            headers: {
-                'AccessToken': accessToken
-            }
-        }).then(res => {
-            if (res.data) {
-                $.runForm(driverHelper.ARRIVED_AT_SITE_FORM, (result) => {
-                    if (result) {
-                        ArrivedAtSite($);
-                    }
-                })
-            }
-        })
-        .catch(() => {
-            $.sendMessage(startPickupConstants.SOMETHING_WENT_WRONG);
-            $.runForm(driverHelper.LEAVING_OFFICE_FORM, (result) => {
-                if (result) {
-                    DepartFromOffice($);;
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/DepartFromOffice`, {},
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                if (res.data) {
+                    ArrivedAtSiteMenu($);
                 }
             })
-        })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+                LeavingOfficeMenu($);
+            })
+        }
+    })
+    .catch(() => {
+        console.log('Something went wrong!');
     });
+}
+
+async function ArrivedAtSiteMenu($) {
+    $.runMenu({
+		message: startPickupConstants.ARRIVED_AT_SITE_QUESTION,
+		oneTimeKeyboard: true,
+		options: {
+			parse_mode: 'Markdown',
+		},
+		layout: [2],
+		'Yes': async () => {
+			ArrivedAtSite($);
+		},
+		'No': async () => {
+			ArrivedAtSiteMenu($);
+		}, 
+	})
 }
 
 async function ArrivedAtSite($) {
     $.getUserSession('AccessToken')
     .then((accessToken) => {
-        axios.post(`${API_URL}/AriveAtClient`, {},
-        {
-            headers: {
-                'AccessToken': accessToken
-            }
-        }).then(res => {
-            if (res.data) {
-                $.runForm(driverHelper.CONFIRM_DRIVER_FORM, (result) => {
-                    if (result != null) {
-                        ConfirmDriver($, result.otp);
-                    }
-                })
-            }
-        })
-        .catch(() => {
-            $.sendMessage(startPickupConstants.SOMETHING_WENT_WRONG);
-            $.runForm(driverHelper.ARRIVED_AT_SITE_FORM, (result) => {
-                if (result) {
-                    ArrivedAtSite($);
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/AriveAtClient`, {},
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                if (res.data) {
+                    $.runForm(driverHelper.CONFIRM_DRIVER_FORM, (result) => {
+                        if (result != null) {
+                            ConfirmDriver($, result.otp);
+                        }
+                    })
                 }
             })
-        })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+                ArrivedAtSiteMenu($);
+            })
+        }
     });
 }
 
 async function ConfirmDriver($, otp) {
     $.getUserSession('AccessToken')
     .then((accessToken) => {
-        axios.post(`${API_URL}/ConfirmDriverOrder`, {
-            OTP: otp
-        },
-        {
-            headers: {
-                'AccessToken': accessToken
-            }
-        }).then(res => {
-            if (res.data) {
-                $.runForm(driverHelper.SCAN_BARCODE_FORM, (result) => {
-                    if (result != null) {
-                        SendBagPickupBarcode($, result.barcode);
-                    }
-                })
-            }
-        })
-        .catch(() => {
-            $.sendMessage(startPickupConstants.SOMETHING_WENT_WRONG);
-            $.runForm(driverHelper.CONFIRM_DRIVER_FORM, (result) => {
-                if (result != null) {
-                    ConfirmDriver($, result.otp);
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/ConfirmDriverOrder`, {
+                OTP: otp
+            },
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                if (res.data) {
+                    $.runForm(driverHelper.SCAN_BARCODE_FORM, (result) => {
+                        if (result != null) {
+                            SendBagPickupBarcode($, result.barcode);
+                        }
+                    })
                 }
             })
-        })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+                $.runForm(driverHelper.CONFIRM_DRIVER_FORM, (result) => {
+                    if (result != null) {
+                        ConfirmDriver($, result.otp);
+                    }
+                })
+            })
+        }
     });
 }
 
 async function SendBagPickupBarcode($, barcode) {
     $.getUserSession('AccessToken')
     .then((accessToken) => {
-        axios.post(`${API_URL}/SendBagPickupBarcode`, {
-            Barcode: barcode
-        },
-        {
-            headers: {
-                'AccessToken': accessToken
-            }
-        }).then(res => {
-            if (res.data) {
-                $.runForm(driverHelper.LEAVING_SITE_FORM, (result) => {
-                    if (result) {
-                        DepartFromSite($);
-                    }
-                })
-            }
-        })
-        .catch(() => {
-            $.sendMessage(startPickupConstants.SOMETHING_WENT_WRONG);
-            $.runForm(driverHelper.SCAN_BARCODE_FORM, (result) => {
-                if (result != null) {
-                    SendBagPickupBarcode($, result.barcode);
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/SendBagPickupBarcode`, {
+                Barcode: barcode
+            },
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                if (res.data) {
+                    DepartFromSiteMenu($);
                 }
             })
-        })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+                $.runForm(driverHelper.SCAN_BARCODE_FORM, (result) => {
+                    if (result != null) {
+                        SendBagPickupBarcode($, result.barcode);
+                    }
+                })
+            })
+        }
     });
+}
+
+async function DepartFromSiteMenu($) {
+    $.runMenu({
+		message: startPickupConstants.LEAVING_SITE_QUESTION,
+		oneTimeKeyboard: true,
+		options: {
+			parse_mode: 'Markdown',
+		},
+		layout: [2],
+		'Yes': async () => {
+			DepartFromSite($);
+		},
+		'No': async () => {
+			DepartFromSiteMenu($);
+		}, 
+	})
 }
 
 async function DepartFromSite($) {
     $.getUserSession('AccessToken')
     .then((accessToken) => {
-        axios.post(`${API_URL}/DepartFromClient`, {},
-        {
-            headers: {
-                'AccessToken': accessToken
-            }
-        }).then(res => {
-            if (res.data) {
-                $.runForm(driverHelper.ARRIVED_AT_OFFICE_FORM, (result) => {
-                    if (result) {
-                        ArrivedAtOffice($);
-                    }
-                })
-            }
-        })
-        .catch(() => {
-            $.sendMessage(startPickupConstants.SOMETHING_WENT_WRONG);
-            $.runForm(driverHelper.LEAVING_SITE_FORM, (result) => {
-                if (result) {
-                    DepartFromSite($);
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/DepartFromClient`, {},
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                if (res.data) {
+                    ArriveAtOfficeMenu($);
                 }
             })
-        })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+                DepartFromSiteMenu($);
+            })
+        }
     });
+}
+
+async function ArriveAtOfficeMenu($) {
+    $.runMenu({
+		message: startPickupConstants.ARRIVED_AT_OFFICE_QUESTION,
+		oneTimeKeyboard: true,
+		options: {
+			parse_mode: 'Markdown',
+		},
+		layout: [2],
+		'Yes': async () => {
+			ArrivedAtOffice($);
+		},
+		'No': async () => {
+			ArriveAtOfficeMenu($);
+		}, 
+	})
 }
 
 async function ArrivedAtOffice($) {
     $.getUserSession('AccessToken')
     .then((accessToken) => {
-        axios.post(`${API_URL}/AriveAtOffice`, {},
-        {
-            headers: {
-                'AccessToken': accessToken
-            }
-        }).then(res => {
-            if (res.data) {
-                $.sendMessage(startPickupConstants.PICKUP_ENDED);
-            }
-        })
-        .catch(() => {
-            $.sendMessage(startPickupConstants.SOMETHING_WENT_WRONG);
-            $.runForm(driverHelper.ARRIVED_AT_OFFICE_FORM, (result) => {
-                if (result) {
-                    ArrivedAtOffice($);
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/AriveAtOffice`, {},
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                if (res.data) {
+                    $.sendMessage(startPickupConstants.PICKUP_ENDED);
                 }
             })
-        })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+                ArriveAtOfficeMenu($);
+            })
+        }
     });
 }
 
 async function RequestPickupLocation($) {
     $.getUserSession('AccessToken')
     .then((accessToken) => {
-        axios.post(`${API_URL}/GetDriverOrderDetails`, {},
-        {
-            headers: {
-                'AccessToken': accessToken
-            }
-        }).then(res => {
-            $.sendMessage(driverHelper.SendWalletLocation(res.data.clientName, res.data.walletAddress.addressLineOne, res.data.walletAddress.addressLineTwo));
-        })
-        .catch(() => {
-            $.sendMessage(startPickupConstants.SOMETHING_WENT_WRONG);
-        })
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/GetDriverOrderDetails`, {},
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                $.sendMessage(driverHelper.SendWalletLocation(res.data.clientName, res.data.walletAddress.addressLineOne, res.data.walletAddress.addressLineTwo));
+            })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+            })
+        }
     });
 }
 
 module.exports = {
+    LeavingOfficeMenu,
     DepartFromOffice,
     ArrivedAtSite,
     ConfirmDriver,

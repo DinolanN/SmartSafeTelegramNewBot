@@ -10,7 +10,7 @@ class ConversationController extends Telegram.TelegramBaseController {
     }
 
     helpHandler($) {
-        $.sendMessage(conversationHelper.COMMANDS);
+        $.sendMessage(conversationHelper.ALL_COMMANDS);
     }
 
     get routes() {
