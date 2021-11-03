@@ -3,67 +3,9 @@
 const conversationConstants = require('../Constants/ConversationConstants');
 const startPickupConstants = conversationConstants.START_PICKUP;
 
+const driverService = require('../APIService/DriverService');
+
 const generalHelper = require('../Helpers/GeneralHelper');
-
-const LEAVING_OFFICE_FORM = {
-    hasLeft: {
-	    q: startPickupConstants.LEAVING_OFFICE_QUESTION,
-	    error: startPickupConstants.WRONG_INPUT_ERROR,
-	    validator: (message, callback) => {
-		    if(message.text && generalHelper.isYes(message.text)) {
-			    callback(true, generalHelper.isYes(message.text));
-			    return;
-		    }
-
-		    callback(false);
-	    }
-    }
-}
-
-const LEAVING_SITE_FORM = {
-    hasLeft: {
-	    q: startPickupConstants.LEAVING_SITE_QUESTION,
-	    error: startPickupConstants.WRONG_INPUT_ERROR,
-	    validator: (message, callback) => {
-		    if(message.text && generalHelper.isYes(message.text)) {
-			    callback(true, generalHelper.isYes(message.text));
-			    return;
-		    }
-
-		    callback(false);
-	    }
-    }
-}
-
-const ARRIVED_AT_OFFICE_FORM = {
-    hasLeft: {
-	    q: startPickupConstants.ARRIVED_AT_OFFICE_QUESTION,
-	    error: startPickupConstants.WRONG_INPUT_ERROR,
-	    validator: (message, callback) => {
-		    if(message.text && generalHelper.isYes(message.text)) {
-			    callback(true, generalHelper.isYes(message.text));
-			    return;
-		    }
-
-		    callback(false);
-	    }
-    }
-}
-
-const ARRIVED_AT_SITE_FORM = {
-    hasLeft: {
-	    q: startPickupConstants.ARRIVED_AT_SITE_QUESTION,
-	    error: startPickupConstants.WRONG_INPUT_ERROR,
-	    validator: (message, callback) => {
-		    if(message.text && generalHelper.isYes(message.text)) {
-			    callback(true, generalHelper.isYes(message.text));
-			    return;
-		    }
-
-		    callback(false);
-	    }
-    }
-}
 
 const CONFIRM_DRIVER_FORM = {
     otp: {
@@ -100,11 +42,7 @@ function SendWalletLocation(name, addressLineOne, addressLineTwo) {
 }
 
 module.exports = {
-    LEAVING_OFFICE_FORM,
-    LEAVING_SITE_FORM,
-    ARRIVED_AT_OFFICE_FORM,
-    ARRIVED_AT_SITE_FORM,
-    CONFIRM_DRIVER_FORM,
+	CONFIRM_DRIVER_FORM,
     SCAN_BARCODE_FORM,
 	SendWalletLocation
 };

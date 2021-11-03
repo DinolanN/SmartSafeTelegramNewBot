@@ -22,7 +22,8 @@ const REGISTER_OPTIONS = [
     'register',
     'Register',
     'r',
-    'R'
+    'R',
+    '/start'
 ];
 
 const REQUEST_PICKUP_OPTIONS = [

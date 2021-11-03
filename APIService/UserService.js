@@ -20,10 +20,14 @@ async function RegisterUser(registerModel, $) {
         TelegramChatId: registerModel.TelegramChatId
     }).then(res => {
         let registerObj = Object.create(registerModel);
-
         $.setUserSession('AccessToken', res.headers.accesstoken)
         .then(() => {
             return $.getUserSession('AccessToken')
+        });
+
+        $.setUserSession('Permission', res.headers.permission)
+        .then(() => {
+            return $.getUserSession('Permission')
         });
 
         if (res.data == 1) {
@@ -39,8 +43,8 @@ async function RegisterUser(registerModel, $) {
             });
         }
     })
-    .catch(() => {
-        $.sendMessage(registrationConstants.SOMETHING_WENT_WRONG);
+    .catch((error) => {
+        $.sendMessage(registrationConstants.SOMETHING_WENT_WRONG + `\n\n${error.response.data}`);
     })
 }
 
@@ -49,116 +53,137 @@ async function ConfirmUser(registerModel, barcodePin, $) {
 
     $.getUserSession('AccessToken')
         .then((accessToken) => {
-            axios.post(`${API_URL}/ConfirmUser`, {
-                ConfirmationCode: registerModel.ConfirmationCode,
-                TelegramChatId: registerModel.TelegramChatId
-            },
-            {
-                headers: {
-                    'AccessToken': accessToken
-                }
-            }).then(res => {
-                if (res.data == 3) {
-                    $.sendMessage('User Successfully Registered!');
-                }
-                else {
-                    $.runForm(userHelper.UPDATE_DRIVER_DETAILS_FORM, (result) => {
-                        if (result != null) {
-                            if (result.idNumber != null || result.idNumber != 0) {
-                                driverObj.IdNumber = result.idNumber;
+            if (accessToken == '[object Object]') {
+                $.sendMessage('Please Register, No access token is present!');
+            }
+            else {
+                axios.post(`${API_URL}/ConfirmUser`, {
+                    ConfirmationCode: registerModel.ConfirmationCode,
+                    TelegramChatId: registerModel.TelegramChatId
+                },
+                {
+                    headers: {
+                        'AccessToken': accessToken
+                    }
+                }).then(res => {
+                    if (res.data == 3) {
+                        $.sendMessage('User Successfully Registered!');
+                        $.sendMessage(conversationHelper.NORMAL_COMMANDS);
+                    }
+                    else {
+                        $.runForm(userHelper.UPDATE_DRIVER_DETAILS_FORM, (result) => {
+                            if (result != null) {
+                                if (result.idNumber != null || result.idNumber != 0) {
+                                    driverObj.IdNumber = result.idNumber;
+                                }
+                                driverObj.UserChatId = $.chatId;
+                                driverObj.CellPhoneNumber = barcodePin;
                             }
-                            driverObj.UserChatId = $.chatId;
-                            driverObj.CellPhoneNumber = barcodePin;
-                        }
-            
-                        UpdateDriverUser(driverObj, $);
-                    });
-                }
-            })
-            .catch(() => {
-                $.sendMessage(registrationConstants.SOMETHING_WENT_WRONG);
-            })
+                
+                            UpdateDriverUser(driverObj, $);
+                        });
+                    }
+                })
+                .catch((error) => {
+                    $.sendMessage(registrationConstants.SOMETHING_WENT_WRONG + `\n\n${error.response.data}`);
+                })
+            }
         });
 }
 
 async function UpdateDriverUser(driverModel, $) {
     $.getUserSession('AccessToken')
         .then((accessToken) => {
-            axios.post(`${API_URL}/UpdateDriverDetails`, {
-                CellPhoneNumber: driverModel.CellPhoneNumber,
-                UserChatId: driverModel.UserChatId,
-                IdNumber: driverModel.IdNumber
-            },
-            {
-                headers: {
-                    'AccessToken': accessToken
-                }
-            }).then(() => {
-                $.sendMessage('User Successfully Registered!');
-            })
-            .catch(() => {
-                $.sendMessage(registrationConstants.SOMETHING_WENT_WRONG);
-            })
+            if (accessToken == '[object Object]') {
+                $.sendMessage('Please Register, No access token is present!');
+            }
+            else {
+                axios.post(`${API_URL}/UpdateDriverDetails`, {
+                    CellPhoneNumber: driverModel.CellPhoneNumber,
+                    UserChatId: driverModel.UserChatId,
+                    IdNumber: driverModel.IdNumber
+                },
+                {
+                    headers: {
+                        'AccessToken': accessToken
+                    }
+                }).then(() => {
+                    $.sendMessage('User Successfully Registered!');
+                    $.sendMessage(conversationHelper.DRIVER_COMMANDS);
+                })
+                .catch((error) => {
+                    $.sendMessage(registrationConstants.SOMETHING_WENT_WRONG + `\n\n${error.response.data}`);
+                })
+            }
         });
 }
 
 async function RequestPickup(requestPickupModel, $) {
     $.getUserSession('AccessToken')
         .then((accessToken) => {
-            axios.post(`${API_URL}/AddWalletSettlement`, {
-                ExpectedAmount: requestPickupModel.ExpectedAmount,
-                UserChatId: requestPickupModel.UserChatId
-            },
-            {
-                headers: {
-                    'AccessToken': accessToken
-                }
-            }).then(res => {
-                $.sendMessage(requestPickupConstants.SUCCESS_MESSAGE);
-                $.sendMessage(userHelper.SendDriverDetails(res.data.driverDetails.name, res.data.driverDetails.otp));
-            })
-            .catch(() => {
-                $.sendMessage(requestPickupConstants.SOMETHING_WENT_WRONG);
-            })
+            if (accessToken == '[object Object]') {
+                $.sendMessage('Please Register, No access token is present!');
+            } 
+            else {
+                axios.post(`${API_URL}/AddWalletSettlement`, {
+                    ExpectedAmount: requestPickupModel.ExpectedAmount,
+                    UserChatId: requestPickupModel.UserChatId
+                },
+                {
+                    headers: {
+                        'AccessToken': accessToken
+                    }
+                }).then(res => {
+                    $.sendMessage(requestPickupConstants.SUCCESS_MESSAGE);
+                    $.sendMessage(userHelper.SendDriverDetails(res.data.driverDetails.name, res.data.driverDetails.otp));
+                })
+                .catch((error) => {
+                    $.sendMessage(error.response.data);
+                })
+            }
         });
 }
 
 async function RequestAmountType(requestAmountObj, command,$) {
     $.getUserSession('AccessToken')
         .then((accessToken) => {
-            if (conversationHelper.checkWalletAmountText(command)) {
-                console.log(requestAmountObj.UserChatId);
-                axios.post(`${API_URL}/GetWalletBalance`, {
-                    UserChatId: requestAmountObj.UserChatId
-                },
-                {
-                    headers: {
-                        'AccessToken': accessToken
-                    }
-                }).then(res => {
-                    $.sendMessage(`The Total Amount to be Settled to you is:\n\nR${res.data.walletSettlementBalance.toFixed(2)}`);
-                })
-                .catch(() => {
-                    $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
-                });
-            }
-            else if (conversationHelper.checkPickupAmountText(command)){
-                axios.post(`${API_URL}/GetPickupAmount`, {
-                    UserChatId: requestAmountObj.UserChatId
-                },
-                {
-                    headers: {
-                        'AccessToken': accessToken
-                    }
-                }).then(res => {
-                    $.sendMessage(`Today\'s Pickup Amount is:\n\nR${res.data.walletSettlementBalance.toFixed(2)}`);
-                })
-                .catch(() => {
-                    $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
-                });
-            }
+            if (accessToken == '[object Object]') {
+                $.sendMessage('Please Register, No access token is present!');
+            } 
             else {
-                $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
+                if (conversationHelper.checkWalletAmountText(command)) {
+                    axios.post(`${API_URL}/GetWalletBalance`, {
+                        UserChatId: requestAmountObj.UserChatId
+                    },
+                    {
+                        headers: {
+                            'AccessToken': accessToken
+                        }
+                    }).then(res => {
+                        $.sendMessage(`The Total Amount to be Settled to you is:\n\nR${res.data.walletSettlementBalance.toFixed(2)}`);
+                    })
+                    .catch((error) => {
+                        $.sendMessage(error.response.data);
+                    });
+                }
+                else if (conversationHelper.checkPickupAmountText(command)){
+                    axios.post(`${API_URL}/GetPickupAmount`, {
+                        UserChatId: requestAmountObj.UserChatId
+                    },
+                    {
+                        headers: {
+                            'AccessToken': accessToken
+                        }
+                    }).then(res => {
+                        $.sendMessage(`Today\'s Pickup Amount is:\n\nR${res.data.walletSettlementBalance.toFixed(2)}`);
+                    })
+                    .catch((error) => {
+                        $.sendMessage(error.response.data);
+                    });
+                }
+                else {
+                    $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
+                }
             }
         });
 }
@@ -166,19 +191,24 @@ async function RequestAmountType(requestAmountObj, command,$) {
 async function GetMonthsPickupList(getmonthsListObj, $) {
     $.getUserSession('AccessToken')
         .then((accessToken) => {
-            axios.post(`${API_URL}/GetMonthsPickupList`, {
-                UserChatId: getmonthsListObj.UserChatId
-            },
-            {
-                headers: {
-                    'AccessToken': accessToken
-                }
-            }).then(res => {
-                $.sendMessage(userHelper.sendStructuredMonthsPickupList(res.data));
-            })
-            .catch(() => {
-                $.sendMessage(requestAmountConstants.SOMETHING_WENT_WRONG);
-            });
+            if (accessToken == '[object Object]') {
+                $.sendMessage('Please Register, No access token is present!');
+            } 
+            else {
+                axios.post(`${API_URL}/GetMonthsPickupList`, {
+                    UserChatId: getmonthsListObj.UserChatId
+                },
+                {
+                    headers: {
+                        'AccessToken': accessToken
+                    }
+                }).then(res => {
+                    $.sendMessage(userHelper.sendStructuredMonthsPickupList(res.data));
+                })
+                .catch((error) => {
+                    $.sendMessage(error.response.data);
+                });
+            }
         });
 }
 
