@@ -9,6 +9,31 @@ const startPickupConstants = conversationConstants.START_PICKUP;
 
 const driverHelper = require('../Helpers/DriverHelper');
 
+async function AvailableOrders($) {
+    $.getUserSession('AccessToken')
+    .then((accessToken) => {
+        if (accessToken == '[object Object]') {
+            $.sendMessage('Please Register, No access token is present!');
+        }
+        else {
+            axios.post(`${API_URL}/AvailableOrders`, {},
+            {
+                headers: {
+                    'AccessToken': accessToken
+                }
+            }).then(res => {
+                if (res.data) {
+                    $.sendMessage(startPickupConstants.PICKUP_STARTED);
+                    LeavingOfficeMenu($);
+                }
+            })
+            .catch((error) => {
+                $.sendMessage(error.response.data);
+            })
+        }
+    });
+}
+
 async function LeavingOfficeMenu($) {
     $.runMenu({
 		message: startPickupConstants.LEAVING_OFFICE_QUESTION,
@@ -48,9 +73,6 @@ async function DepartFromOffice($) {
                 LeavingOfficeMenu($);
             })
         }
-    })
-    .catch(() => {
-        console.log('Something went wrong!');
     });
 }
 
@@ -273,6 +295,7 @@ async function RequestPickupLocation($) {
 }
 
 module.exports = {
+    AvailableOrders,
     LeavingOfficeMenu,
     DepartFromOffice,
     ArrivedAtSite,
