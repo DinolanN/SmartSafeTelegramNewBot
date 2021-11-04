@@ -11,8 +11,7 @@ const driverHelper = require('../Helpers/DriverHelper');
 
 class DriverController extends Telegram.TelegramBaseController {
     async startPickupHandler($) {
-        $.sendMessage(startPickupConstants.PICKUP_STARTED);
-        driverService.LeavingOfficeMenu($);
+        driverService.AvailableOrders($);
     }
 
     async requestPickupLocationHandler($) {
